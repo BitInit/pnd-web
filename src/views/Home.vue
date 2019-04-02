@@ -12,7 +12,6 @@
 <script>
 import Header from '@/views/layout/Header'
 import Aside from '@/views/layout/Aside'
-// import Main from '@/views/layout/Main'
 
 export default {
   name: 'home',

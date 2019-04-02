@@ -50,7 +50,6 @@
                 <el-table-column 
                     label="操作"
                     min-width="22">
-                    <!-- <i class="el-icon-more operation"></i> -->
                     <template scope="scope">
                         <el-dropdown>
                             <span class="el-dropdown-link">
@@ -73,6 +72,7 @@
 
 <script>
 import FileIcon from '@/components/FileIcon'
+
 export default {
     components: {
         FileIcon
@@ -433,7 +433,6 @@ export default {
 <style ref="stylesheet/scss" lang="scss" scoped>
 .content{
     margin-top: 20px;
-    
     .content-table{
         margin-top: 10px;
     }
@@ -441,8 +440,8 @@ export default {
 .el-dropdown-link {
     cursor: pointer;
     color: #409EFF;
-  }
-  .el-icon-arrow-down {
-    font-size: 12px;
-  }
+}
+.el-icon-arrow-down {
+font-size: 12px;
+}
 </style>

@@ -1,8 +1,20 @@
 <template>
   <div id="app">
     <router-view></router-view>
+    <FileUpload />
   </div>
 </template>
+
+<script>
+import FileUpload from '@/components/FileUpload'
+
+export default {
+  components: {
+    FileUpload
+  }
+}
+</script>
+
 
 <style>
 html, body {
