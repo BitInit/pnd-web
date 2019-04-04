@@ -18,33 +18,35 @@
                 ref="multipleTable"
                 :data="tableData"
                 tooltip-effect="dark"
-                show-summary
                 :default-sort = "{prop: 'fileName', order: 'descending'}"
                 style="width: 100%">
-                <!-- <el-table-column
-                    type="selection"
-                    min-width="2">
-                </el-table-column> -->
                 <el-table-column
                     label="文件名"
-                    prop="fileName"
+                    prop="name"
                     sortable
                     min-width="54">
                     <template scope="scope">
                         <FileIcon :type="scope.row.type"></FileIcon>
-                        <span style="display: inline-block; padding-left: 5px">{{scope.row.fileName}}</span>
+                        <a class="file-name" @click="getFileList(scope.row.id)" v-if="scope.row.type === 'folder'">
+                            {{scope.row.name}}
+                        </a>
+                        <a class="file-name" v-else>
+                            {{scope.row.name}}
+                        </a>
                     </template>
                 </el-table-column>
                 <el-table-column
                     prop="size"
                     label="大小"
+                    :formatter="formatterSize"
                     min-width="22">
                 </el-table-column>
                 <el-table-column
-                    prop="modifyTime"
+                    prop="gmtModified"
                     label="修改日期"
                     sortable
                     min-width="22"
+                    :formatter="formatterTime"
                     show-overflow-tooltip>
                 </el-table-column>
                 <el-table-column 
@@ -59,7 +61,7 @@
                                 <el-dropdown-item @click="moveTo(scope.$index, tableData)">移动到</el-dropdown-item>
                                 <el-dropdown-item>复制到</el-dropdown-item>
                                 <el-dropdown-item>重命名</el-dropdown-item>
-                                <el-dropdown-item>下载</el-dropdown-item>
+                                <el-dropdown-item v-if="scope.row.type !== 'folder'">下载</el-dropdown-item>
                                 <el-dropdown-item>删除</el-dropdown-item>
                             </el-dropdown-menu>
                         </el-dropdown>
@@ -72,6 +74,8 @@
 
 <script>
 import FileIcon from '@/components/FileIcon'
+import { fetchFileList } from '@/api/resource'
+import { formatterMillisecond } from '@/util/common_utils'
 
 export default {
     components: {
@@ -79,353 +83,41 @@ export default {
     }, 
     data(){
         return {
-            tableData: [{
-                type: 'folder',
-                fileName: '电影',
-                size: '-',
-                modifyTime: '2018-12-09'
-            },{
-                type: 'video',
-                fileName: '勇敢的心',
-                size: '2G',
-                modifyTime: '2019-01-02'
-            },{
-                type: 'folder',
-                fileName: '电影',
-                size: '-',
-                modifyTime: '2018-12-09'
-            },{
-                type: 'video',
-                fileName: '勇敢的心',
-                size: '2G',
-                modifyTime: '2019-01-02'
-            },{
-                type: 'folder',
-                fileName: '电影',
-                size: '-',
-                modifyTime: '2018-12-09'
-            },{
-                type: 'video',
-                fileName: '勇敢的心',
-                size: '2G',
-                modifyTime: '2019-01-02'
-            },{
-                type: 'folder',
-                fileName: '电影',
-                size: '-',
-                modifyTime: '2018-12-09'
-            },{
-                type: 'video',
-                fileName: '勇敢的心',
-                size: '2G',
-                modifyTime: '2019-01-02'
-            },{
-                type: 'folder',
-                fileName: '电影',
-                size: '-',
-                modifyTime: '2018-12-09'
-            },{
-                type: 'video',
-                fileName: '勇敢的心',
-                size: '2G',
-                modifyTime: '2019-01-02'
-            },{
-                type: 'folder',
-                fileName: '电影',
-                size: '-',
-                modifyTime: '2018-12-09'
-            },{
-                type: 'video',
-                fileName: '勇敢的心',
-                size: '2G',
-                modifyTime: '2019-01-02'
-            },{
-                type: 'folder',
-                fileName: '电影',
-                size: '-',
-                modifyTime: '2018-12-09'
-            },{
-                type: 'video',
-                fileName: '勇敢的心',
-                size: '2G',
-                modifyTime: '2019-01-02'
-            },{
-                type: 'folder',
-                fileName: '电影',
-                size: '-',
-                modifyTime: '2018-12-09'
-            },{
-                type: 'video',
-                fileName: '勇敢的心',
-                size: '2G',
-                modifyTime: '2019-01-02'
-            },{
-                type: 'folder',
-                fileName: '电影',
-                size: '-',
-                modifyTime: '2018-12-09'
-            },{
-                type: 'video',
-                fileName: '勇敢的心',
-                size: '2G',
-                modifyTime: '2019-01-02'
-            },{
-                type: 'folder',
-                fileName: '电影',
-                size: '-',
-                modifyTime: '2018-12-09'
-            },{
-                type: 'video',
-                fileName: '勇敢的心',
-                size: '2G',
-                modifyTime: '2019-01-02'
-            },{
-                type: 'folder',
-                fileName: '电影',
-                size: '-',
-                modifyTime: '2018-12-09'
-            },{
-                type: 'video',
-                fileName: '勇敢的心',
-                size: '2G',
-                modifyTime: '2019-01-02'
-            },{
-                type: 'folder',
-                fileName: '电影',
-                size: '-',
-                modifyTime: '2018-12-09'
-            },{
-                type: 'video',
-                fileName: '勇敢的心',
-                size: '2G',
-                modifyTime: '2019-01-02'
-            },{
-                type: 'folder',
-                fileName: '电影',
-                size: '-',
-                modifyTime: '2018-12-09'
-            },{
-                type: 'video',
-                fileName: '勇敢的心',
-                size: '2G',
-                modifyTime: '2019-01-02'
-            },{
-                type: 'folder',
-                fileName: '电影',
-                size: '-',
-                modifyTime: '2018-12-09'
-            },{
-                type: 'video',
-                fileName: '勇敢的心',
-                size: '2G',
-                modifyTime: '2019-01-02'
-            },{
-                type: 'folder',
-                fileName: '电影',
-                size: '-',
-                modifyTime: '2018-12-09'
-            },{
-                type: 'video',
-                fileName: '勇敢的心',
-                size: '2G',
-                modifyTime: '2019-01-02'
-            },{
-                type: 'folder',
-                fileName: '电影',
-                size: '-',
-                modifyTime: '2018-12-09'
-            },{
-                type: 'video',
-                fileName: '勇敢的心',
-                size: '2G',
-                modifyTime: '2019-01-02'
-            },{
-                type: 'folder',
-                fileName: '电影',
-                size: '-',
-                modifyTime: '2018-12-09'
-            },{
-                type: 'video',
-                fileName: '勇敢的心',
-                size: '2G',
-                modifyTime: '2019-01-02'
-            },{
-                type: 'folder',
-                fileName: '电影',
-                size: '-',
-                modifyTime: '2018-12-09'
-            },{
-                type: 'video',
-                fileName: '勇敢的心',
-                size: '2G',
-                modifyTime: '2019-01-02'
-            },{
-                type: 'folder',
-                fileName: '电影',
-                size: '-',
-                modifyTime: '2018-12-09'
-            },{
-                type: 'video',
-                fileName: '勇敢的心',
-                size: '2G',
-                modifyTime: '2019-01-02'
-            },{
-                type: 'folder',
-                fileName: '电影',
-                size: '-',
-                modifyTime: '2018-12-09'
-            },{
-                type: 'video',
-                fileName: '勇敢的心',
-                size: '2G',
-                modifyTime: '2019-01-02'
-            },{
-                type: 'folder',
-                fileName: '电影',
-                size: '-',
-                modifyTime: '2018-12-09'
-            },{
-                type: 'video',
-                fileName: '勇敢的心',
-                size: '2G',
-                modifyTime: '2019-01-02'
-            },{
-                type: 'folder',
-                fileName: '电影',
-                size: '-',
-                modifyTime: '2018-12-09'
-            },{
-                type: 'video',
-                fileName: '勇敢的心',
-                size: '2G',
-                modifyTime: '2019-01-02'
-            },{
-                type: 'folder',
-                fileName: '电影',
-                size: '-',
-                modifyTime: '2018-12-09'
-            },{
-                type: 'video',
-                fileName: '勇敢的心',
-                size: '2G',
-                modifyTime: '2019-01-02'
-            },{
-                type: 'folder',
-                fileName: '电影',
-                size: '-',
-                modifyTime: '2018-12-09'
-            },{
-                type: 'video',
-                fileName: '勇敢的心',
-                size: '2G',
-                modifyTime: '2019-01-02'
-            },{
-                type: 'folder',
-                fileName: '电影',
-                size: '-',
-                modifyTime: '2018-12-09'
-            },{
-                type: 'video',
-                fileName: '勇敢的心',
-                size: '2G',
-                modifyTime: '2019-01-02'
-            },{
-                type: 'folder',
-                fileName: '电影',
-                size: '-',
-                modifyTime: '2018-12-09'
-            },{
-                type: 'video',
-                fileName: '勇敢的心',
-                size: '2G',
-                modifyTime: '2019-01-02'
-            },{
-                type: 'folder',
-                fileName: '电影',
-                size: '-',
-                modifyTime: '2018-12-09'
-            },{
-                type: 'video',
-                fileName: '勇敢的心',
-                size: '2G',
-                modifyTime: '2019-01-02'
-            },{
-                type: 'folder',
-                fileName: '电影',
-                size: '-',
-                modifyTime: '2018-12-09'
-            },{
-                type: 'video',
-                fileName: '勇敢的心',
-                size: '2G',
-                modifyTime: '2019-01-02'
-            },{
-                type: 'folder',
-                fileName: '电影',
-                size: '-',
-                modifyTime: '2018-12-09'
-            },{
-                type: 'video',
-                fileName: '勇敢的心',
-                size: '2G',
-                modifyTime: '2019-01-02'
-            },{
-                type: 'folder',
-                fileName: '电影',
-                size: '-',
-                modifyTime: '2018-12-09'
-            },{
-                type: 'video',
-                fileName: '勇敢的心',
-                size: '2G',
-                modifyTime: '2019-01-02'
-            },{
-                type: 'folder',
-                fileName: '电影',
-                size: '-',
-                modifyTime: '2018-12-09'
-            },{
-                type: 'video',
-                fileName: '勇敢的心',
-                size: '2G',
-                modifyTime: '2019-01-02'
-            },{
-                type: 'folder',
-                fileName: '电影888',
-                size: '-',
-                modifyTime: '2018-12-09'
-            },{
-                type: 'video',
-                fileName: '勇敢的心9999',
-                size: '2G',
-                modifyTime: '2019-01-02'
-            },{
-                type: 'folder',
-                fileName: '电影0000',
-                size: '-',
-                modifyTime: '2018-12-09'
-            },{
-                type: 'video',
-                fileName: '勇敢的心22222',
-                size: '2G',
-                modifyTime: '2019-01-02'
-            },{
-                type: 'folder',
-                fileName: '电影111',
-                size: '-',
-                modifyTime: '2018-12-09'
-            },{
-                type: 'video',
-                fileName: '勇敢的心1111',
-                size: '2G',
-                modifyTime: '2019-01-02'
-            }],
+            levelList: [],
+            tableData: [],
         }
     },
     methods: {
         moveTo: function(index, tableData){
             alert(index, tableData)
+        },
+        getFileList: function(parentId){
+            console.info(parentId)
+            fetchFileList(parentId).then(response => {
+                console.info(response.data)
+                this.tableData = response.data
+            })
+        },
+        formatterTime: function(row, column){
+            return formatterMillisecond(new Date(row.gmtModified))
+        },
+        formatterSize: function(row, column){
+            let s = row.size
+            if (s === 0) {
+                return '-'
+            } else if (s < 1024) {
+                return s + 'K'
+            } else if(s < 1024 * 1024) {
+                return (s / 1024).toFixed(1) + 'M'
+            } else if (s < 1024 * 1024 * 1024) {
+                return Math.floor(s / (1024 * 1024)) + 'G'
+            } else {
+                return Math.floor(s / (1024 * 1024 * 1024)) + 'P'
+            }
         }
+    },
+    created() {
+        this.getFileList(0)
     }
 }
 </script>
@@ -442,6 +134,16 @@ export default {
     color: #409EFF;
 }
 .el-icon-arrow-down {
-font-size: 12px;
+    font-size: 12px;
+}
+.file-name{
+    display: inline-block; 
+    padding-left: 5px;
+    text-decoration: none;
+    color: #000;
+    cursor: pointer;
+}
+.file-name:hover{
+    color: #3794ff;
 }
 </style>

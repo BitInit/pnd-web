@@ -1,23 +1,45 @@
 <template>
     <div>
-        <div class="file-upload-layout" :class="[status === 'open'? 'open': 'close']">
+        <div class="file-upload-layout" @click="operationWindow('collapse')" :class="[status === 'open'? 'open': 'close']">
             <div class="dialog-header">
                 <span class="dialog-header-title">文件上传</span>
                 <div class="dialog-control">
-                    <span @click="collapseWindow">-</span>
-                    <span @click="closeWindow">x</span>
+                    <span @click="operationWindow('collapse')">-</span>
+                    <span @click.stop.prevent="operationWindow('close')">x</span>
                 </div>
             </div>
             <div class="dialog-body">
-                
+                <el-table
+                    :data="tableData"
+                    height=360
+                    style="width: 100%">
+                    <el-table-column
+                        prop="fileName"
+                        label="文件名"
+                        width="180">
+                    </el-table-column>
+                    <el-table-column
+                        prop="size"
+                        label="大小"
+                        width="180">
+                    </el-table-column>
+                    <el-table-column
+                        prop="dir"
+                        label="上传目录">
+                    </el-table-column>
+                    <el-table-column
+                        prop="status"
+                        label="状态">
+                    </el-table-column>
+                </el-table>
             </div>
         </div>
-        <div class="file-upload-layout collapse-header" :class="[status === 'collapse'? 'collapse': 'close']">
+        <div class="file-upload-layout collapse-header" @click="operationWindow('open')" :class="[status === 'collapse'? 'collapse': 'close']">
             <div class="dialog-header">
                 <span class="dialog-header-title">文件上传</span>
                 <div class="dialog-control">
-                    <span @click="openWindow">□</span>
-                    <span @click="closeWindow">x</span>
+                    <span @click="operationWindow('open')">□</span>
+                    <span @click.stop.prevent="operationWindow('close')">x</span>
                 </div>
             </div>
         </div>
@@ -25,22 +47,32 @@
 </template>
 
 <script>
+import {mapState} from 'vuex'
 export default {
     data() {
         return {
-            // 窗口状态 打开:open 关闭:close 折叠:collapse
-            status: 'collapse'
+            // status: 'close',
+            tableData: [{
+                fileName: '肖生克的救赎',
+                size: '1.5G',
+                dir: '全部文件',
+                status: 'success'
+            },{
+                fileName: 'coco',
+                size: '1.7G',
+                dir: '全部文件',
+                status: 'success'
+            }]
         }
     },
+    computed: {
+        ...mapState({
+            status: state => state.fileUploadComponentStatus
+        })
+    },
     methods: {
-        closeWindow: function(){
-            this.status = 'close'
-        },
-        collapseWindow: function(){
-            this.status = 'collapse'
-        },
-        openWindow: function(){
-            this.status = 'open'
+        operationWindow(status) {
+            this.$store.commit('operationFileUploadWindow', status)
         }
     }
 }

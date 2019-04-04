@@ -1,5 +1,5 @@
 <template>
-    <div class="aside">
+    <div class="aside" :style="{display: asideStatus}">
       <el-menu
         default-active="1"
         background-color="#fff"
@@ -20,18 +20,12 @@
 
 <script>
   export default {
-    data() {
-      return {
-        isCollapse: true
-      };
+    computed: {
+      asideStatus () {
+        return this.$store.state.asideStatus
+      }
     },
     methods: {
-      handleOpen(key, keyPath) {
-        console.log(key, keyPath);
-      },
-      handleClose(key, keyPath) {
-        console.log(key, keyPath);
-      },
       linkTo(url){
         this.$router.push({path: url})
       }
@@ -44,7 +38,6 @@
   padding-top: 10px;
   /* height: 100%; */
   width: 200px;
-  display: inline-block;
 }
 .el-menu-vertical:not(.el-menu--collapse) {
   width: 200px;

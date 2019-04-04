@@ -5,7 +5,7 @@
       background-color="#4284f4"
       text-color="#fff">
       <div class="menu">
-        <img src="@/assets/menu.png" alt="切换主菜单">
+        <img src="@/assets/menu.png" @click="toggleAsideStatus" alt="切换主菜单">
         <span>全部文件</span>
       </div>
       <el-dropdown class="avatar-container" trigger="click">
@@ -25,7 +25,6 @@
 </template>
 
 <script>
-
 export default {
   data() {
     return {
@@ -35,6 +34,9 @@ export default {
   methods: {
     handleSelect(key, keyPath) {
       console.log(key, keyPath, "4284f4");
+    },
+    toggleAsideStatus(){
+      this.$store.commit('toggleAside')
     }
   }
 }
