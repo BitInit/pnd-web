@@ -20,6 +20,9 @@ export default new Vuex.Store({
     },
     pushLevelList (state, val){
       state.levelList.push(val)
+    },
+    spliceLevelList(state, index){
+      state.levelList.splice(index + 1, state.levelList.length - index)
     }
   },
   actions: {

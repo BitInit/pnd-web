@@ -51,7 +51,7 @@
                     label="操作"
                     min-width="22">
                     <template scope="scope">
-                        <FileOperation :scope="scope" />
+                        <FileOperation v-on:flush="flushAccordingToLevelList" :scope="scope" />
                     </template>
                 </el-table-column>
             </el-table>
@@ -80,17 +80,24 @@ export default {
             return this.$store.state.levelList
         }
     },
+    watch: {
+        levelList (){
+            this.flushAccordingToLevelList()
+        }
+    },
     methods: {
-        createFolder: function(){
+        createFolder (){
             let parentId = this.levelList[this.levelList.length - 1].parentId
             this.$prompt('请输入文件夹名', '新建文件夹', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
             }).then(({value}) => {
-                createNewFolder(parentId, value)
+                createNewFolder(parentId, value).then(response => {
+                    this.flushAccordingToLevelList()
+                })
             }).catch(() => {})
         },
-        getFileList: function(parentId, name){
+        getFileList (parentId, name){
             fetchFileList(parentId).then(response => {
                 this.tableData = response.data
                 let len = this.levelList.length
@@ -103,10 +110,14 @@ export default {
                 })
             })
         },
-        formatterTime: function(row, column){
+        flushAccordingToLevelList (){
+            let lastVal = this.levelList[this.levelList.length - 1]
+            this.getFileList(lastVal.parentId, lastVal.name)
+        },
+        formatterTime (row, column){
             return formatterMillisecond(new Date(row.gmtModified))
         },
-        formatterSize: function(row, column){
+        formatterSize (row, column){
             let s = row.size
             if (s === 0) {
                 return '-'
@@ -125,8 +136,7 @@ export default {
         if (this.levelList.length === 0){
             this.getFileList(0, '全部文件')
         } else {
-            let lastVal = this.levelList[this.levelList.length - 1]
-            this.getFileList(lastVal.parentId, lastVal.name)
+            this.flushAccordingToLevelList()
         }
     }
 }

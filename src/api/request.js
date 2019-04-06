@@ -9,8 +9,12 @@ var r = Axios.create({
 r.interceptors.response.use(response => {
     return response.data
 }, error => {
+    var msg = error
+    if (error.response && error.response.data && error.response.data.msg) {
+        msg = error.response.data.msg
+    }
     Message({
-        message: error,
+        message: msg,
         type: 'error',
         duration: 3 * 1000
     })

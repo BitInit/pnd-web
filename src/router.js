@@ -10,14 +10,12 @@ export default new Router({
   // mode: 'history',
   base: process.env.BASE_URL,
   routes: [
+    { path: '/', redirect: '/file', name: '首页'},
     {
       path: '/',
       name: 'home',
       component: Home,
       children: [{
-        path: '',
-        redirect: '/file'
-      },{
         path: 'file',
         component: Main
       },{
