@@ -5,15 +5,13 @@
                 <i class="el-icon-upload"></i>
                 <span>上传文件</span>
             </el-button>
-            <el-button plain>
+            <el-button plain @click="createFolder">
                 <i class="el-icon-document"></i>
                 <span>新建文件夹</span>
             </el-button>
         </div>
         <div class="content">
-            <el-breadcrumb separator="/">
-                <el-breadcrumb-item :to="{ path: '/' }">全部文件</el-breadcrumb-item>
-            </el-breadcrumb>
+            <Breadcrumb />
             <el-table
                 ref="multipleTable"
                 :data="tableData"
@@ -27,7 +25,7 @@
                     min-width="54">
                     <template scope="scope">
                         <FileIcon :type="scope.row.type"></FileIcon>
-                        <a class="file-name" @click="getFileList(scope.row.id)" v-if="scope.row.type === 'folder'">
+                        <a class="file-name" @click="getFileList(scope.row.id, scope.row.name)" v-if="scope.row.type === 'folder'">
                             {{scope.row.name}}
                         </a>
                         <a class="file-name" v-else>
@@ -53,18 +51,7 @@
                     label="操作"
                     min-width="22">
                     <template scope="scope">
-                        <el-dropdown>
-                            <span class="el-dropdown-link">
-                                <i class="el-icon-more operation"></i>
-                            </span>
-                            <el-dropdown-menu slot="dropdown">
-                                <el-dropdown-item @click="moveTo(scope.$index, tableData)">移动到</el-dropdown-item>
-                                <el-dropdown-item>复制到</el-dropdown-item>
-                                <el-dropdown-item>重命名</el-dropdown-item>
-                                <el-dropdown-item v-if="scope.row.type !== 'folder'">下载</el-dropdown-item>
-                                <el-dropdown-item>删除</el-dropdown-item>
-                            </el-dropdown-menu>
-                        </el-dropdown>
+                        <FileOperation :scope="scope" />
                     </template>
                 </el-table-column>
             </el-table>
@@ -74,28 +61,46 @@
 
 <script>
 import FileIcon from '@/components/FileIcon'
-import { fetchFileList } from '@/api/resource'
+import Breadcrumb from '@/components/Breadcrumb'
+import FileOperation from '@/components/FileOperation'
+import { fetchFileList, createNewFolder } from '@/api/resource'
 import { formatterMillisecond } from '@/util/common_utils'
 
 export default {
     components: {
-        FileIcon
+        FileIcon, Breadcrumb, FileOperation
     }, 
     data(){
         return {
-            levelList: [],
             tableData: [],
         }
     },
+    computed: {
+        levelList () {
+            return this.$store.state.levelList
+        }
+    },
     methods: {
-        moveTo: function(index, tableData){
-            alert(index, tableData)
+        createFolder: function(){
+            let parentId = this.levelList[this.levelList.length - 1].parentId
+            this.$prompt('请输入文件夹名', '新建文件夹', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+            }).then(({value}) => {
+                createNewFolder(parentId, value)
+            }).catch(() => {})
         },
-        getFileList: function(parentId){
-            console.info(parentId)
+        getFileList: function(parentId, name){
             fetchFileList(parentId).then(response => {
-                console.info(response.data)
                 this.tableData = response.data
+                let len = this.levelList.length
+                if (len !== 0 && this.levelList[len - 1].parentId === parentId){
+                    return
+                }
+                this.$store.commit('pushLevelList', {
+                    parentId: parentId,
+                    name: name
+                })
             })
         },
         formatterTime: function(row, column){
@@ -110,14 +115,19 @@ export default {
             } else if(s < 1024 * 1024) {
                 return (s / 1024).toFixed(1) + 'M'
             } else if (s < 1024 * 1024 * 1024) {
-                return Math.floor(s / (1024 * 1024)) + 'G'
+                return (s / (1024 * 1024)).toFixed(1) + 'G'
             } else {
-                return Math.floor(s / (1024 * 1024 * 1024)) + 'P'
+                return (s / (1024 * 1024 * 1024)).toFixed(1) + 'P'
             }
         }
     },
     created() {
-        this.getFileList(0)
+        if (this.levelList.length === 0){
+            this.getFileList(0, '全部文件')
+        } else {
+            let lastVal = this.levelList[this.levelList.length - 1]
+            this.getFileList(lastVal.parentId, lastVal.name)
+        }
     }
 }
 </script>

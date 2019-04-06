@@ -9,3 +9,13 @@ export function fetchFileList(parentId) {
         }
     })
 }
+
+export function createNewFolder(parentId, folderName){
+    return request({
+        url: '/v1/file1',
+        method: 'post',
+        params: {
+            parentId, folderName
+        }
+    })
+}

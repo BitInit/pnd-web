@@ -1,6 +1,5 @@
 
 export function formatterMillisecond(date, format = 'yyyy-MM-dd hh:mm:ss'){
-
     var o = {
         "M+" : date.getMonth() + 1, // month
         "d+" : date.getDate(), // day

@@ -8,7 +8,8 @@ export default new Vuex.Store({
     // 侧边栏样式
     asideStatus: 'inline-block',
     // 文件上传窗口状态 打开:open 关闭:close 折叠:collapse
-    fileUploadComponentStatus: 'close'
+    fileUploadComponentStatus: 'close',
+    levelList: []
   },
   mutations: {
     toggleAside(state) {
@@ -16,6 +17,9 @@ export default new Vuex.Store({
     },
     operationFileUploadWindow (state, status) {
       state.fileUploadComponentStatus = status
+    },
+    pushLevelList (state, val){
+      state.levelList.push(val)
     }
   },
   actions: {
