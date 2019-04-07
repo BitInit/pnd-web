@@ -5,9 +5,9 @@
         </span>
         <el-dropdown-menu slot="dropdown">
             <el-dropdown-item @click.native="move">移动到</el-dropdown-item>
-            <el-dropdown-item @click.native="move">复制到</el-dropdown-item>
+            <el-dropdown-item @click.native="copy">复制到</el-dropdown-item>
             <el-dropdown-item @click.native="rename">重命名</el-dropdown-item>
-            <el-dropdown-item @click.native="move" v-if="scope.row.type !== 'folder'">下载</el-dropdown-item>
+            <el-dropdown-item @click.native="copy" v-if="scope.row.type !== 'folder'">下载</el-dropdown-item>
             <el-dropdown-item @click.native="deleteResource">删除</el-dropdown-item>
         </el-dropdown-menu>
     </el-dropdown>
@@ -19,6 +19,12 @@ export default {
     props: ['scope'],
     methods: {
         move: function(){
+            this.$store.commit('openFileTreeDialog', {
+                title: '移动到',
+                id: this.scope.row.id
+            })
+        },
+        copy: function(){
             this.$message({
                 message: '该功能还为开发',
                 type: 'warning',
@@ -26,12 +32,13 @@ export default {
             })
         },
         rename: function(){
+            // TODO 文件名校验
             this.$prompt('请输入新的文件名', '重新命名', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 inputValue: this.scope.row.name
             }).then(({value}) => {
-                renameFile(this.scope.row.id, value).then(response => {
+                renameFile(this.scope.row.id, value).then(() => {
                     this.$emit('flush')
                 })
             }).catch(() => {})

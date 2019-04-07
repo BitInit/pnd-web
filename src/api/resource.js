@@ -36,3 +36,17 @@ export function deleteFile(id){
         method: 'delete',
     })
 }
+
+export function fetchSubfolder(id){
+    return request({
+        url: '/v1/file/' + id + '/subfolder',
+        method: 'get'
+    })
+}
+
+export function moveFile(id, targetId){
+    return request({
+        url: '/v1/file/' + id + '/move/' + targetId,
+        method: 'put'
+    })
+}

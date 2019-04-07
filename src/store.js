@@ -9,7 +9,11 @@ export default new Vuex.Store({
     asideStatus: 'inline-block',
     // 文件上传窗口状态 打开:open 关闭:close 折叠:collapse
     fileUploadComponentStatus: 'close',
-    levelList: []
+    levelList: [],
+    fileTreeDialogVisible: false,
+    fileTreeInfo: {
+      title: '设置'
+    }
   },
   mutations: {
     toggleAside(state) {
@@ -23,6 +27,13 @@ export default new Vuex.Store({
     },
     spliceLevelList(state, index){
       state.levelList.splice(index + 1, state.levelList.length - index)
+    },
+    openFileTreeDialog(state, info){
+      state.fileTreeDialogVisible = true
+      state.fileTreeInfo = info
+    },
+    closeFileTreeDialog (state){
+      state.fileTreeDialogVisible = false
     }
   },
   actions: {

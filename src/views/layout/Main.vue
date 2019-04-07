@@ -56,6 +56,7 @@
                 </el-table-column>
             </el-table>
         </div>
+        <FileTree v-on:flush="flushAccordingToLevelList" v-if="$store.state.fileTreeDialogVisible" />
     </el-main>
 </template>
 
@@ -63,16 +64,19 @@
 import FileIcon from '@/components/FileIcon'
 import Breadcrumb from '@/components/Breadcrumb'
 import FileOperation from '@/components/FileOperation'
+import FileTree from '@/components/FileTree'
 import { fetchFileList, createNewFolder } from '@/api/resource'
 import { formatterMillisecond } from '@/util/common_utils'
 
 export default {
     components: {
-        FileIcon, Breadcrumb, FileOperation
+        FileIcon, Breadcrumb, FileOperation, FileTree
     }, 
     data(){
         return {
             tableData: [],
+            fileTreeDialogVisible: false,
+            dialogVisible: '设置'
         }
     },
     computed: {
@@ -88,11 +92,12 @@ export default {
     methods: {
         createFolder (){
             let parentId = this.levelList[this.levelList.length - 1].parentId
+            // TODO 文件夹名校验
             this.$prompt('请输入文件夹名', '新建文件夹', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
             }).then(({value}) => {
-                createNewFolder(parentId, value).then(response => {
+                createNewFolder(parentId, value).then(() => {
                     this.flushAccordingToLevelList()
                 })
             }).catch(() => {})
@@ -114,10 +119,10 @@ export default {
             let lastVal = this.levelList[this.levelList.length - 1]
             this.getFileList(lastVal.parentId, lastVal.name)
         },
-        formatterTime (row, column){
+        formatterTime (row){
             return formatterMillisecond(new Date(row.gmtModified))
         },
-        formatterSize (row, column){
+        formatterSize (row){
             let s = row.size
             if (s === 0) {
                 return '-'
