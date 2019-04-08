@@ -50,3 +50,11 @@ export function moveFile(id, targetId){
         method: 'put'
     })
 }
+
+export function copyFile(id, targetIds){
+    return request({
+        url: '/v1/file/' + id + '/copy',
+        method: 'post',
+        data: targetIds
+    })
+}

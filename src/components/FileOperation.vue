@@ -5,9 +5,9 @@
         </span>
         <el-dropdown-menu slot="dropdown">
             <el-dropdown-item @click.native="move">移动到</el-dropdown-item>
-            <el-dropdown-item @click.native="copy">复制到</el-dropdown-item>
+            <el-dropdown-item @click.native="copy" v-if="scope.row.type !== 'folder'">复制到</el-dropdown-item>
             <el-dropdown-item @click.native="rename">重命名</el-dropdown-item>
-            <el-dropdown-item @click.native="copy" v-if="scope.row.type !== 'folder'">下载</el-dropdown-item>
+            <el-dropdown-item @click.native="download" v-if="scope.row.type !== 'folder'">下载</el-dropdown-item>
             <el-dropdown-item @click.native="deleteResource">删除</el-dropdown-item>
         </el-dropdown-menu>
     </el-dropdown>
@@ -20,11 +20,19 @@ export default {
     methods: {
         move: function(){
             this.$store.commit('openFileTreeDialog', {
-                title: '移动到',
-                id: this.scope.row.id
+                title: '[' + this.scope.row.name + '] 移动到',
+                id: this.scope.row.id,
+                type: 'move'
             })
         },
         copy: function(){
+            this.$store.commit('openFileTreeDialog', {
+                title: '[' + this.scope.row.name + '] 复制到',
+                id: this.scope.row.id,
+                type: 'copy'
+            })
+        },
+        download: function(){
             this.$message({
                 message: '该功能还为开发',
                 type: 'warning',
