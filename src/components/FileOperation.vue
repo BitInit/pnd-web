@@ -57,16 +57,8 @@ export default {
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                deleteFile(this.scope.row.id).then(response => {
-                    if (response.code === 500){
-                        this.$message({
-                            message: response.msg,
-                            type: 'error',
-                            duration: 3 * 1000
-                        })
-                    } else {
-                        this.$emit('flush')
-                    }
+                deleteFile(this.scope.row.id).then(() => {
+                    this.$emit('flush')
                 })
             }).catch(() => {});
         }
