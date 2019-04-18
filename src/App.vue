@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <router-view></router-view>
-    <FileUpload />
+    <FileUpload v-if="$store.state.fileUploadComponentStatus !== 'close'"/>
   </div>
 </template>
 

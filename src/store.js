@@ -9,6 +9,7 @@ export default new Vuex.Store({
     asideStatus: 'inline-block',
     // 文件上传窗口状态 打开:open 关闭:close 折叠:collapse
     fileUploadComponentStatus: 'close',
+    fileUploadList: [],
     levelList: [],
     fileTreeDialogVisible: false,
     fileTreeInfo: {
@@ -21,6 +22,13 @@ export default new Vuex.Store({
     },
     operationFileUploadWindow (state, status) {
       state.fileUploadComponentStatus = status
+    },
+    addUploadFile (state, fileUploadInfo) {
+      //fileUploadInfo格式 {targetId: x, targetFileName: x, file: jsFileObject} jsFileObject {name: 'xx', size: 'xx'}
+      state.fileUploadList.push(fileUploadInfo)
+    },
+    clearFileUploadList(state){
+      state.fileUploadList = []
     },
     pushLevelList (state, val){
       state.levelList.push(val)

@@ -2,7 +2,7 @@ import Axios from "axios"
 import { Message } from 'element-ui'
 
 var r = Axios.create({
-    baseURL: '/',
+    baseURL: 'http://localhost:8989/',
     timeout: 10000
 })
 

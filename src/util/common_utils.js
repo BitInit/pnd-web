@@ -37,3 +37,18 @@ export function formatterMillisecond(date, format = 'yyyy-MM-dd hh:mm:ss'){
     }
     return format;
 }
+
+export function formatterFileSize (s) {
+    s = parseInt(s)
+    if (s === 0) {
+        return '-'
+    } else if (s < 1024) {
+        return s + 'B'
+    } else if(s < 1024 * 1024) {
+        return (s / 1024).toFixed(1) + 'K'
+    } else if (s < 1024 * 1024 * 1024) {
+        return (s / (1024 * 1024)).toFixed(1) + 'M'
+    } else {
+        return (s / (1024 * 1024 * 1024)).toFixed(1) + 'G'
+    }
+}

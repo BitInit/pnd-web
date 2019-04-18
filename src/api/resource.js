@@ -58,3 +58,12 @@ export function copyFile(id, targetIds){
         data: targetIds
     })
 }
+
+export function resourceExist(crc){
+    return request({
+        url: '/v1/resource/crc',
+        params: {
+            crc
+        }
+    })
+}

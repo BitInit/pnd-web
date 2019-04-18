@@ -1,10 +1,13 @@
 <template>
     <el-main>
         <div class="main-button">
-            <el-button type="primary">
-                <i class="el-icon-upload"></i>
-                <span>上传文件</span>
-            </el-button>
+            <div class="upload" @click="triggerFileUpload">
+                <el-button type="primary">
+                    <i class="el-icon-upload"></i>
+                    <span>上传文件</span>
+                </el-button>
+                <input type="file" @change="dealWithFileUpload" ref="fileInput" name="file" multiple class="upload-input">
+            </div>
             <el-button plain @click="createFolder">
                 <i class="el-icon-document"></i>
                 <span>新建文件夹</span>
@@ -66,7 +69,7 @@ import Breadcrumb from '@/components/Breadcrumb'
 import FileOperation from '@/components/FileOperation'
 import FileTree from '@/components/FileTree'
 import { fetchFileList, createNewFolder } from '@/api/resource'
-import { formatterMillisecond } from '@/util/common_utils'
+import { formatterMillisecond, formatterFileSize } from '@/util/common_utils'
 
 export default {
     components: {
@@ -123,18 +126,24 @@ export default {
             return formatterMillisecond(new Date(row.gmtModified))
         },
         formatterSize (row){
-            let s = row.size
-            if (s === 0) {
-                return '-'
-            } else if (s < 1024) {
-                return s + 'K'
-            } else if(s < 1024 * 1024) {
-                return (s / 1024).toFixed(1) + 'M'
-            } else if (s < 1024 * 1024 * 1024) {
-                return (s / (1024 * 1024)).toFixed(1) + 'G'
-            } else {
-                return (s / (1024 * 1024 * 1024)).toFixed(1) + 'P'
-            }
+            return formatterFileSize(row.size)
+        },
+        triggerFileUpload () {
+            this.$refs.fileInput.click()
+        },
+        dealWithFileUpload (event){
+            this.$store.commit('clearFileUploadList')
+            let files = event.target.files
+            let target = this.levelList[this.levelList.length - 1]
+            Array.from(files).forEach( file => {
+                let fileInfo = {
+                    targetId: target.parentId,
+                    targetFileName: target.name,
+                    file: file
+                }
+                this.$store.commit('addUploadFile', fileInfo)
+            })
+            this.$store.commit('operationFileUploadWindow', 'open')
         }
     },
     created() {
@@ -148,6 +157,13 @@ export default {
 </script>
 
 <style ref="stylesheet/scss" lang="scss" scoped>
+.upload {
+    display: inline-block;
+    margin-right: 10px;
+    .upload-input{
+        display: none;
+    }
+}
 .content{
     margin-top: 20px;
     .content-table{

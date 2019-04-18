@@ -32,9 +32,6 @@ export default {
     };
   },
   methods: {
-    handleSelect(key, keyPath) {
-      console.log(key, keyPath, "4284f4");
-    },
     toggleAsideStatus(){
       this.$store.commit('toggleAside')
     }
