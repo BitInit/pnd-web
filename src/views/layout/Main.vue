@@ -85,10 +85,16 @@ export default {
     computed: {
         levelList () {
             return this.$store.state.levelList
+        },
+        flushFileListEvent(){
+            return this.$store.state.flushFileListEvent
         }
     },
     watch: {
         levelList (){
+            this.flushAccordingToLevelList()
+        },
+        flushFileListEvent(){
             this.flushAccordingToLevelList()
         }
     },
@@ -137,8 +143,8 @@ export default {
             let target = this.levelList[this.levelList.length - 1]
             Array.from(files).forEach( file => {
                 let fileInfo = {
-                    targetId: target.parentId,
-                    targetFileName: target.name,
+                    folderId: target.parentId,
+                    targetFolderName: target.name,
                     file: file
                 }
                 this.$store.commit('addUploadFile', fileInfo)

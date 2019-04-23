@@ -14,7 +14,8 @@ export default new Vuex.Store({
     fileTreeDialogVisible: false,
     fileTreeInfo: {
       title: '设置'
-    }
+    },
+    flushFileListEvent: 0
   },
   mutations: {
     toggleAside(state) {
@@ -24,7 +25,7 @@ export default new Vuex.Store({
       state.fileUploadComponentStatus = status
     },
     addUploadFile (state, fileUploadInfo) {
-      //fileUploadInfo格式 {targetId: x, targetFileName: x, file: jsFileObject} jsFileObject {name: 'xx', size: 'xx'}
+      //fileUploadInfo格式 {folderId: x, targetFolderName: x, file: jsFileObject} jsFileObject {name: 'xx', size: 'xx'}
       state.fileUploadList.push(fileUploadInfo)
     },
     clearFileUploadList(state){
@@ -42,6 +43,9 @@ export default new Vuex.Store({
     },
     closeFileTreeDialog (state){
       state.fileTreeDialogVisible = false
+    },
+    flushFileListEvent (state){
+      state.flushFileListEvent++
     }
   },
   actions: {

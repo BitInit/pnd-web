@@ -25,7 +25,7 @@
                         width="80">
                     </el-table-column>
                     <el-table-column
-                        prop="targetFolder"
+                        prop="targetFolderName"
                         label="上传目录">
                     </el-table-column>
                     <el-table-column
@@ -33,8 +33,9 @@
                         label="状态">
                         <template scope="scope">
                             <i v-if="scope.row.status === 'success'" class="el-icon-success" style="color: #3794ff;"></i>
-                            <span v-else-if="scope.row.status === 'check'">检查中...</span>
-                            <span v-else-if="scope.row.status === 'prepare'">等待中...</span>
+                            <span v-else-if="scope.row.status === 'check'">校验中...</span>
+                            <span v-else-if="scope.row.status === 'prepareUpload'">等待中...</span>
+                            <span v-else-if="scope.row.status === 'uploading'">上传中...</span>
                             <span v-else-if="scope.row.status === 'pause'">已暂停</span>
                             <span v-else>{{ scope.row.status }}</span>
                         </template>
@@ -43,7 +44,7 @@
                         label="操作">
                         <template scope="scope">
                             <i @click="statusChange(scope.row, 'prepare')" v-if="scope.row.status === 'pause' && scope.row.status !== 'success'" class="el-icon-caret-right file-upload-operation"></i>
-                            <span @click="statusChange(scope.row, 'pause')" title="暂停" v-else-if="scope.row.status !== 'success'" class="file-upload-operation file-upload-suspend"></span>
+                            <span @click="statusChange(scope.row, 'paused')" title="暂停" v-else-if="scope.row.status !== 'success'" class="file-upload-operation file-upload-suspend"></span>
                             <i @click="deleteFile(scope.row)" title="删除" class="el-icon-close file-upload-operation"></i>
                         </template>
                     </el-table-column>
@@ -63,16 +64,17 @@
 </template>
 
 <script>
-import { formatterFileSize } from '@/util/common_utils.js'
+import { formatterFileSize, getPercent } from '@/util/common_utils.js'
 import {fileFingerPoint} from '@/util/crc32_utils.js'
-import {resourceExist} from '@/api/resource.js'
+import {getConfig, resourceExist, createFile, prepareFileUpload, fileUpload} from '@/api/resource.js'
 import {mapState} from 'vuex'
 export default {
     data() {
         return {
             tableData: [],
             maxConcurrentUploadNumbers: 3,
-            chunkByteSize: 10485760
+            chunkByteSize: 10485760,
+            clientId: ''
         }
     },
     computed: {
@@ -143,8 +145,8 @@ export default {
         addFileUploadList(val){
             let pendingFileIds = []
             for (let i = 0; i < val.length; i++){
-                let fileName = val[i].file.name, size = val[i].file.size, targetFolder = val[i].targetFileName
-                let  file = val[i].file, targetId = val[i].targetId
+                let fileName = val[i].file.name, size = val[i].file.size, targetFolderName = val[i].targetFolderName
+                let  file = val[i].file, folderId = val[i].folderId
                 let j = 0
                 for (; j < this.tableData.length; j++){
                     if (this.isEqualsOfFiles(this.tableData[j], {fileName, size})){
@@ -153,13 +155,12 @@ export default {
                 }
                 if (j === this.tableData.length){
                     let pendingFile = {
-                        id: j,
-                        targetId,
+                        folderId,
                         fileName,
                         size,
-                        targetFolder,
-                        status: 'prepare',
-                        file
+                        targetFolderName,
+                        status: 'check',
+                        blob: file
                     }
                     this.tableData.push(pendingFile)
                     pendingFileIds.push(j)
@@ -167,19 +168,89 @@ export default {
             }
             if (pendingFileIds.length > 0){
                 for (let id in pendingFileIds){
-                    let pendingFileId = pendingFileIds[id], data = this.tableData[pendingFileId]
-                    data.status = 'check'
-                    fileFingerPoint(this.tableData[pendingFileId].file, function(crc){
-                        resourceExist(crc).then((response) => {
-                            if (response.data){
-                                data.status = 'success'
+                    let pendingFileId = pendingFileIds[id], 
+                        data = this.tableData[pendingFileId], 
+                        that = this
+                    fileFingerPoint(this.tableData[pendingFileId].blob, function(fingerPrint){
+                        resourceExist(fingerPrint).then((response) => {
+                            if (response.data.exist){
+                                let file = {
+                                    resourceId: response.data.resourceId,
+                                    name: data.fileName,
+                                    parentId: data.folderId
+                                }
+                                createFile(file).then(() => {
+                                    data.status = 'success'
+                                    that.$store.commit('flushFileListEvent')
+                                })
                             } else {
-                                data.status = 'prepare'
+                                prepareFileUpload(that.clientId, data.size, fingerPrint, data.fileName, data.folderId).then((response) => {
+                                    data.resourceId = response.data.resourceId
+                                    data.status = 'prepareUpload'
+                                    that.fileUploadProcess()
+                                })
                             }
                         })
                     })
                 }
             }
+        },
+        fileUploadProcess () {
+            // 上传文件达到最大限制数
+            let canUploadFileNumber = this.maxConcurrentUploadNumbers - this.numberOfCurrentlyUploading()
+            for (let fileId in this.tableData){
+                if (canUploadFileNumber > 0 && this.tableData[fileId].status === 'prepareUpload'){
+                    canUploadFileNumber--
+                    this.tableData[fileId].finishedUploadBytes = 0
+                    this.tableData[fileId].status = 'uploading'
+                    this.go(fileId, this.tableData[fileId])
+                }
+            }
+        },
+        // 文件分块上传
+        go (fileId, pendingFile) {
+            let end = pendingFile.finishedUploadBytes + this.chunkByteSize
+            if (end > pendingFile.blob.size){
+                end = pendingFile.blob.size
+            }
+
+            var chunk = pendingFile.blob.slice(pendingFile.finishedUploadBytes, end),
+                reader = new FileReader(), that = this
+            var formData = new FormData()
+                    formData.set('resourceId', pendingFile.resourceId)
+                    formData.set('clientId', this.clientId)
+                    formData.append('file', chunk)
+            reader.onloadend = function(e){
+                if (e.target.readyState == FileReader.DONE){
+                    fileUpload(formData).then((response) => {
+                        that.tableData[fileId].finishedUploadBytes = response.data.completeBytes
+                        if (response.data.code !== 0){ //暂停
+                            that.tableData[fileId].status = 'pause'
+                            that.fileUploadProcess()
+                        } else {
+                            if (response.data.completeBytes === pendingFile.size){
+                                that.tableData[fileId].status = 'success'
+                                that.fileUploadProcess()
+                                that.$store.commit('flushFileListEvent')
+                            } else {
+                                that.tableData[fileId].status = getPercent(response.data.completeBytes, pendingFile.size)
+                                that.go(fileId, pendingFile)
+                            }
+                        }
+                    })
+                }
+            }
+            reader.readAsBinaryString(chunk)
+        },
+        numberOfCurrentlyUploading () {
+            let numberOfUploadsBeingProcessed = 0
+            for (let fileId in this.tableData){
+                var pendingFile = this.tableData[fileId]
+                if (pendingFile.status === 'uploading'){
+                    numberOfUploadsBeingProcessed++
+                }
+            }
+            return numberOfUploadsBeingProcessed
         },
         isEqualsOfFiles (f, s){
             if (f.fileName === s.fileName && f.size === s.size){
@@ -189,7 +260,12 @@ export default {
         }
     },
     created () {
-        this.addFileUploadList(this.$store.state.fileUploadList)
+        getConfig().then((response) => {
+            this.maxConcurrentUploadNumbers = response.data.maxConcurrentUploadNumbers
+            this.chunkByteSize = response.data.chunkByteSize
+            this.clientId = response.data.clientId
+            this.addFileUploadList(this.$store.state.fileUploadList)
+        })
     }
 }
 </script>

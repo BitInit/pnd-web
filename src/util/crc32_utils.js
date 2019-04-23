@@ -28,7 +28,7 @@ export function hexStringCrc32(str){
 }
 
 export function fileFingerPoint(file, callback) {
-    var chunkSize = 10485760, 
+    var chunkSize = 10485760,
         chunks = Math.ceil(file.size / chunkSize),
         currentChunk = 0, chunkInterval = 19,
         fileReader = new FileReader(),

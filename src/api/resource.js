@@ -12,11 +12,19 @@ export function fetchFileList(parentId) {
 
 export function createNewFolder(parentId, folderName){
     return request({
-        url: '/v1/file',
+        url: '/v1/file/folder',
         method: 'post',
         params: {
             parentId, folderName
         }
+    })
+}
+
+export function createFile (data){
+    return request({
+        url: '/v1/file',
+        method: 'post',
+        data
     })
 }
 
@@ -59,11 +67,38 @@ export function copyFile(id, targetIds){
     })
 }
 
-export function resourceExist(crc){
+export function getConfig(){
     return request({
-        url: '/v1/resource/crc',
+        url: 'v1/rs/config',
+    })
+}
+
+export function resourceExist(fingerPrint){
+    return request({
+        url: '/v1/rs/fingerPrint',
         params: {
-            crc
+            fingerPrint
         }
+    })
+}
+
+export function prepareFileUpload (clientId, size, fileFingerPrint, fileName, parentId){
+    return request({
+        url: '/v1/rs/preparation',
+        method: 'post',
+        params: {
+            clientId, size, fileFingerPrint, fileName, parentId
+        }
+    })
+}
+
+export function fileUpload(formData){
+    return request({
+        url: '/v1/rs/upload',
+        method: 'post',
+        config: {
+            headers: {'Content-Type': 'multipart/form-data'}
+        },
+        data: formData
     })
 }
