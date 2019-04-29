@@ -1,12 +1,12 @@
 import Axios from "axios"
 import { Message } from 'element-ui'
 
-var r = Axios.create({
+var req = Axios.create({
     baseURL: '/',
     timeout: 10000
 })
 
-r.interceptors.response.use(response => {
+req.interceptors.response.use(response => {
     return response.data
 }, error => {
     var msg = error
@@ -21,4 +21,4 @@ r.interceptors.response.use(response => {
     return Promise.reject(error)
 })
 
-export default r
+export default req

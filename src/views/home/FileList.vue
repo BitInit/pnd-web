@@ -26,7 +26,7 @@
                     prop="name"
                     sortable
                     min-width="54">
-                    <template scope="scope">
+                    <template slot-scope="scope">
                         <FileIcon :type="scope.row.type"></FileIcon>
                         <a class="file-name" @click="getFileList(scope.row.id, scope.row.name)" v-if="scope.row.type === 'folder'">
                             {{scope.row.name}}
@@ -53,7 +53,7 @@
                 <el-table-column 
                     label="操作"
                     min-width="22">
-                    <template scope="scope">
+                    <template slot-scope="scope">
                         <FileOperation v-on:flush="flushAccordingToLevelList" :scope="scope" />
                     </template>
                 </el-table-column>
@@ -66,8 +66,8 @@
 <script>
 import FileIcon from '@/components/FileIcon'
 import Breadcrumb from '@/components/Breadcrumb'
-import FileOperation from '@/components/FileOperation'
-import FileTree from '@/components/FileTree'
+import FileOperation from '@/views/home/FileOperation'
+import FileTree from '@/views/home/FileTree'
 import { fetchFileList, createNewFolder } from '@/api/resource'
 import { formatterMillisecond, formatterFileSize } from '@/util/common_utils'
 
@@ -85,16 +85,13 @@ export default {
     computed: {
         levelList () {
             return this.$store.state.levelList
-        },
-        flushFileListEvent(){
-            return this.$store.state.flushFileListEvent
         }
     },
     watch: {
         levelList (){
             this.flushAccordingToLevelList()
         },
-        flushFileListEvent(){
+        '$store.state.flushFileListEvent' (){
             this.flushAccordingToLevelList()
         }
     },
@@ -148,8 +145,8 @@ export default {
                     file: file
                 }
                 this.$store.commit('addUploadFile', fileInfo)
+                this.$store.commit('operationFileUploadWindow', 'open')
             })
-            this.$store.commit('operationFileUploadWindow', 'open')
         }
     },
     created() {
@@ -163,6 +160,9 @@ export default {
 </script>
 
 <style ref="stylesheet/scss" lang="scss" scoped>
+.el-main{
+    margin-bottom: 50px;
+}
 .upload {
     display: inline-block;
     margin-right: 10px;

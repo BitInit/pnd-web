@@ -1,8 +1,5 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from './views/Home.vue'
-import Main from './views/layout/Main'
-import White from './views/layout/White'
 
 Vue.use(Router)
 
@@ -14,13 +11,13 @@ export default new Router({
     {
       path: '/',
       name: 'home',
-      component: Home,
+      component: () => import('./views/Main'),
       children: [{
         path: 'file',
-        component: Main
+        component: () => import('@/views/home/FileList')
       },{
         path: 'white',
-        component: White
+        component: () => import('@/views/layout/White')
       }]
     }
   ]

@@ -31,18 +31,13 @@
                     <el-table-column
                         prop="status"
                         label="状态">
-                        <template scope="scope">
-                            <i v-if="scope.row.status === 'success'" class="el-icon-success" style="color: #3794ff;"></i>
-                            <span v-else-if="scope.row.status === 'check'">校验中...</span>
-                            <span v-else-if="scope.row.status === 'prepareUpload'">等待中...</span>
-                            <span v-else-if="scope.row.status === 'uploading'">上传中...</span>
-                            <span v-else-if="scope.row.status === 'pause'">已暂停</span>
-                            <span v-else>{{ scope.row.status }}</span>
+                        <template slot-scope="scope">
+                            <FileUploadStatus :fileStatus="scope.row.status" />
                         </template>
                     </el-table-column>
                     <el-table-column
                         label="操作">
-                        <template scope="scope">
+                        <template slot-scope="scope">
                             <i @click="statusChange(scope.row, 'prepare')" v-if="scope.row.status === 'pause' && scope.row.status !== 'success'" class="el-icon-caret-right file-upload-operation"></i>
                             <span @click="statusChange(scope.row, 'paused')" title="暂停" v-else-if="scope.row.status !== 'success'" class="file-upload-operation file-upload-suspend"></span>
                             <i @click="deleteFile(scope.row)" title="删除" class="el-icon-close file-upload-operation"></i>
@@ -66,9 +61,13 @@
 <script>
 import { formatterFileSize, getPercent } from '@/util/common_utils.js'
 import {fileFingerPoint} from '@/util/crc32_utils.js'
+import FileUploadStatus from '@/views/upload/FileUploadStatus'
 import {getConfig, resourceExist, createFile, prepareFileUpload, fileUpload} from '@/api/resource.js'
 import {mapState} from 'vuex'
 export default {
+    components: {
+        FileUploadStatus
+    },
     data() {
         return {
             tableData: [],
@@ -79,12 +78,11 @@ export default {
     },
     computed: {
         ...mapState({
-            status: state => state.fileUploadComponentStatus,
-            fileUploadList: state => state.fileUploadList
+            status: state => state.fileUploadComponentStatus
         })
     },
     watch: {
-        fileUploadList (val) {
+        '$store.state.fileUploadList' (val) {
             this.addFileUploadList(val)
         }
     },
@@ -324,9 +322,9 @@ export default {
 .file-upload-suspend {
     width: 16px;
     height: 16px;
-    background-image: url('../assets/suspend.png')
+    background-image: url('../../assets/suspend.png')
 }
 .file-upload-suspend:hover {
-    background-image: url('../assets/suspend_hover.png')
+    background-image: url('../../assets/suspend_hover.png')
 }
 </style>

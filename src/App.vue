@@ -1,16 +1,16 @@
 <template>
   <div id="app">
     <router-view></router-view>
-    <FileUpload v-if="$store.state.fileUploadComponentStatus !== 'close'"/>
+    <Upload v-if="$store.state.fileUploadComponentStatus !== 'close'"/>
   </div>
 </template>
 
 <script>
-import FileUpload from '@/components/FileUpload'
+import Upload from '@/views/upload'
 
 export default {
   components: {
-    FileUpload
+    Upload
   }
 }
 </script>

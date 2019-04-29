@@ -94,7 +94,7 @@ export function prepareFileUpload (clientId, size, fileFingerPrint, fileName, pa
 
 export function fileUpload(formData){
     return request({
-        url: '/v1/rs/upload',
+        url: '/v1/rs',
         method: 'post',
         config: {
             headers: {'Content-Type': 'multipart/form-data'}

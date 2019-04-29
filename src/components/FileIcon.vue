@@ -7,7 +7,9 @@ export default {
     props: {
         type: {
             validator: function(value){
-                return ['default', 'folder', 'pdf', 'compress_file', 'video', 'picture'].indexOf(value) !== -1
+                return ['default', 'folder', 'pdf', 'compress_file', "web",
+                    'video', 'audio', 'picture', 'doc', 'txt', 'torrent', 'ppt',
+                    'code'].indexOf(value) !== -1
             }
         }
     }
@@ -38,7 +40,28 @@ export default {
 .video{
     background-position: -596px -1630px;
 }
+.audio{
+    background-position: -596px -442px;
+}
 .picture{
     background-position: -596px -306px;
+}
+.doc {
+    background-position: -596px -170px;
+}
+.txt {
+    background-position: -596px -102px;
+}
+.ppt {
+    background-position: -596px -204px;
+}
+.torrent {
+    background-position: -596px 0px;
+}
+.web{
+    background-position: -594px -1458px;
+}
+.code {
+    background-position: -596px -1424px;
 }
 </style>
