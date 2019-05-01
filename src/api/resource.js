@@ -82,12 +82,12 @@ export function resourceExist(fingerPrint){
     })
 }
 
-export function prepareFileUpload (clientId, size, fileFingerPrint, fileName, parentId){
+export function prepareFileUpload (clientId, size, md5, fileName, parentId){
     return request({
         url: '/v1/rs/preparation',
         method: 'post',
         params: {
-            clientId, size, fileFingerPrint, fileName, parentId
+            clientId, size, md5, fileName, parentId
         }
     })
 }
@@ -100,5 +100,15 @@ export function fileUpload(formData){
             headers: {'Content-Type': 'multipart/form-data'}
         },
         data: formData
+    })
+}
+
+export const changeFileState = (clientId, resourceId, type) => {
+    return request({
+        url: '/v1/rs/state',
+        method: 'put',
+        params: {
+            clientId, resourceId, type
+        }
     })
 }

@@ -25,7 +25,7 @@ export default new Vuex.Store({
       state.fileUploadComponentStatus = status
     },
     addUploadFile (state, fileUploadInfo) {
-      //fileUploadInfo格式 {folderId: x, targetFolderName: x, file: jsFileObject} jsFileObject {name: 'xx', size: 'xx'}
+      //fileUploadInfo格式 {targetFolderId: x, targetFolderName: x, file: jsFileObject} jsFileObject {name: 'xx', size: 'xx'}
       state.fileUploadList.push(fileUploadInfo)
     },
     clearFileUploadList(state){

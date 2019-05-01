@@ -26,34 +26,3 @@ export function decimalToHexString(number) {
 export function hexStringCrc32(str){
     return decimalToHexString(crc32(str))
 }
-
-export function fileFingerPoint(file, callback) {
-    var chunkSize = 10485760,
-        chunks = Math.ceil(file.size / chunkSize),
-        currentChunk = 0, chunkInterval = 19,
-        fileReader = new FileReader(),
-        crcResult = -1, n = 0
-
-    fileReader.onload = function(e){
-        currentChunk = currentChunk + chunkInterval + 1
-
-        for( var i = 0, iTop = e.target.result.length; i < iTop; i++ ) {
-            n = ( crcResult ^ e.target.result.charCodeAt( i ) ) & 0xFF;
-            crcResult = ( crcResult >>> 8 ) ^ table[n];
-        }
-
-        if (currentChunk < chunks){
-            loadNext()
-        } else {
-            callback(decimalToHexString(crcResult ^ -1))
-        }
-    }
-
-    function loadNext() {
-        let start = currentChunk * chunkSize,
-            end = ((start + chunkSize) >= file.size)? file.size: start + chunkSize
-        fileReader.readAsBinaryString(file.slice(start, end))
-    }
-
-    loadNext()
-}

@@ -140,7 +140,7 @@ export default {
             let target = this.levelList[this.levelList.length - 1]
             Array.from(files).forEach( file => {
                 let fileInfo = {
-                    folderId: target.parentId,
+                    targetFolderId: target.parentId,
                     targetFolderName: target.name,
                     file: file
                 }
