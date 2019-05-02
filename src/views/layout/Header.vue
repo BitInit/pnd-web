@@ -13,7 +13,7 @@
           <img class="user-avatar" src="@/assets/user.jpeg">
         </div>
         <el-dropdown-menu class="user-dropdown" slot="dropdown">
-          <router-link class="inlineBlock" to="/">
+          <router-link class="inlineBlock" to="/file">
             <el-dropdown-item>
               首页
             </el-dropdown-item>

@@ -31,7 +31,10 @@
                         <a class="file-name" @click="getFileList(scope.row.id, scope.row.name)" v-if="scope.row.type === 'folder'">
                             {{scope.row.name}}
                         </a>
-                        <a class="file-name" v-else>
+                        <a class="file-name" target="_blank" @click="openVideo(scope.row.resourceId, scope.row.name)" v-else-if="scope.row.type === 'video'">
+                            {{scope.row.name}}
+                        </a>
+                        <a class="file-name" :href="baseURL + 'v1/rs/' + scope.row.resourceId + '?fileName=' + scope.row.name" v-else>
                             {{scope.row.name}}
                         </a>
                     </template>
@@ -69,7 +72,7 @@ import Breadcrumb from '@/components/Breadcrumb'
 import FileOperation from '@/views/home/FileOperation'
 import FileTree from '@/views/home/FileTree'
 import { fetchFileList, createNewFolder } from '@/api/resource'
-import { formatterMillisecond, formatterFileSize } from '@/util/common_utils'
+import { formatterMillisecond, formatterFileSize, baseUrl } from '@/util/common_utils'
 
 export default {
     components: {
@@ -79,7 +82,8 @@ export default {
         return {
             tableData: [],
             fileTreeDialogVisible: false,
-            dialogVisible: '设置'
+            dialogVisible: '设置',
+            baseURL: baseUrl
         }
     },
     computed: {
@@ -121,6 +125,28 @@ export default {
                 })
             })
         },
+        openVideo (resourceId, fileName) {
+            var src = this.baseURL + 'v1/rs/' + resourceId +'?fileName=' + fileName
+            var supportVideo = ['mp4', 'ogg', 'mkv']
+            var fileInfo = fileName.split('.'), suffix = fileInfo[fileInfo.length - 1]
+            if (supportVideo.some((item) => {
+                return item === suffix
+            })){
+                let page = window.open()
+                let html="<head><title>视频播放</title></head><body style='background:black'><div style='width:80%; height: 80%; margin:60px auto;'><video style='display:inline-block;margin: 0 auto' controls height='80%' width='80%' autoplay src='" + src + "'></video></div></body>"
+                page.document.write(html)
+            } else {
+                this.$confirm('该视频浏览器不支持播放，是否下载？', '下载', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    var a = document.createElement('a')
+                    a.href = src
+                    a.click()
+                }).catch(() => {});
+            }
+        },
         flushAccordingToLevelList (){
             let lastVal = this.levelList[this.levelList.length - 1]
             this.getFileList(lastVal.parentId, lastVal.name)
@@ -129,6 +155,9 @@ export default {
             return formatterMillisecond(new Date(row.gmtModified))
         },
         formatterSize (row){
+            if (row.type === 'folder'){
+                return '-'
+            }
             return formatterFileSize(row.size)
         },
         triggerFileUpload () {

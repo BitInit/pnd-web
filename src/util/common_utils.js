@@ -1,5 +1,6 @@
+export const baseUrl = "http://localhost:8989/"
 
-export function formatterMillisecond(date, format = 'yyyy-MM-dd hh:mm:ss'){
+export const formatterMillisecond = (date, format = 'yyyy-MM-dd hh:mm:ss') => {
     var o = {
         "M+" : date.getMonth() + 1, // month
         "d+" : date.getDate(), // day
@@ -38,11 +39,9 @@ export function formatterMillisecond(date, format = 'yyyy-MM-dd hh:mm:ss'){
     return format;
 }
 
-export function formatterFileSize (s) {
+export const formatterFileSize = (s) => {
     s = parseInt(s)
-    if (s === 0) {
-        return '-'
-    } else if (s < 1024) {
+    if (s < 1024) {
         return s + 'B'
     } else if(s < 1024 * 1024) {
         return (s / 1024).toFixed(1) + 'K'
@@ -53,3 +52,39 @@ export function formatterFileSize (s) {
     }
 }
 
+/**
+ * 文件下载 地址：https://github.com/kennethjiang/js-file-download/blob/master/file-download.js
+ * @param {*} data 
+ * @param {*} filename 
+ * @param {*} mime 
+ */
+export const fileDownload = (data, filename, mime) => {
+    var blob = new Blob([data], {type: mime || 'application/octet-stream'});
+    if (typeof window.navigator.msSaveBlob !== 'undefined') {
+        // IE workaround for "HTML7007: One or more blob URLs were 
+        // revoked by closing the blob for which they were created. 
+        // These URLs will no longer resolve as the data backing 
+        // the URL has been freed."
+        window.navigator.msSaveBlob(blob, filename);
+    }
+    else {
+        var blobURL = window.URL.createObjectURL(blob);
+        var tempLink = document.createElement('a');
+        tempLink.style.display = 'none';
+        tempLink.href = blobURL;
+        tempLink.setAttribute('download', filename); 
+        
+        // Safari thinks _blank anchor are pop ups. We only want to set _blank
+        // target if the browser does not support the HTML5 download attribute.
+        // This allows you to download files in desktop safari if pop up blocking 
+        // is enabled.
+        if (typeof tempLink.download === 'undefined') {
+            tempLink.setAttribute('target', '_blank');
+        }
+        
+        document.body.appendChild(tempLink);
+        tempLink.click();
+        document.body.removeChild(tempLink);
+        window.URL.revokeObjectURL(blobURL);
+    }
+}

@@ -112,3 +112,9 @@ export const changeFileState = (clientId, resourceId, type) => {
         }
     })
 }
+
+export const downloadResource = (resourceId) => {
+    return request({
+        url: '/v1/rs/' + resourceId
+    })
+}

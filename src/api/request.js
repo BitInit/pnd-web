@@ -1,8 +1,9 @@
 import Axios from "axios"
 import { Message } from 'element-ui'
+import {baseUrl} from '@/util/common_utils.js'
 
 var req = Axios.create({
-    baseURL: 'http://localhost:8989/',
+    baseURL: baseUrl,
     timeout: 10000
 })
 

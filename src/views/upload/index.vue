@@ -39,7 +39,7 @@
                         label="操作">
                         <template slot-scope="scope">
                             <i @click="resumeFileUpload(scope.row.id)" title="恢复上传" v-if="scope.row.status === 'paused'" class="el-icon-caret-right file-upload-operation"></i>
-                            <span @click="pauseFile(scope.row.id)" title="暂停" v-else-if="scope.row.status !== 'success'" class="file-upload-operation file-upload-suspend"></span>
+                            <span @click="pauseFile(scope.row.id)" title="暂停" v-else-if="scope.row.status === 'uploading'" class="file-upload-operation file-upload-suspend"></span>
                             <i @click="deleteFile(scope.row.id)" title="删除" class="el-icon-close file-upload-operation"></i>
                         </template>
                     </el-table-column>
