@@ -1,0 +1,7 @@
+@mixin linkTo {
+  text-decoration: none;
+  color: #fff;
+  &:hover {
+    color: #a0d4ff;
+  }
+}

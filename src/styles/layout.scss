@@ -1,0 +1,22 @@
+.app-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.el-header{
+  padding: 0px;
+  background-color: #4182f3;
+  box-shadow: 0 1px 1px rgba(204, 214, 241, 0.897);
+  line-height: 50px;
+  z-index: 10;
+}
+
+.el-aside {
+  border-right: 1px solid #e6e6e6;
+}
+
+.main-container {
+  height: 100%;
+}
+

@@ -1,30 +1,27 @@
 <template>
   <div id="app">
     <router-view></router-view>
-    <Upload v-if="$store.state.fileUploadComponentStatus !== 'close'"/>
+    <FileUpload></FileUpload>
   </div>
 </template>
 
 <script>
-import Upload from '@/views/upload'
-
+import FileUpload from '@/components/FileUpload'
 export default {
+  name: 'app',
   components: {
-    Upload
+    FileUpload
   }
 }
 </script>
 
-<style>
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  overflow-y: hidden;
+<style lang="scss">
+* {
+  margin: 0px;
+  padding: 0px;
 }
-
-#app {
+html, body, #app {
+  width: 100%;
   height: 100%;
-  font: 300 1em/1.8 PingFang SC,Lantinghei SC,Microsoft Yahei,Hiragino Sans GB,Microsoft Sans Serif,WenQuanYi Micro Hei,Helvetica,sans-serif;
 }
 </style>
